@@ -1,0 +1,174 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333;
+}
+
+.container {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+h1 {
+    text-align: center;
+    color: #2a5298;
+}
+
+.logout {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: #888;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.logout:hover {
+    background: #555;
+}
+
+.status-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+    margin: 2rem 0;
+}
+
+.status-card {
+    flex: 1 1 220px;
+    background: linear-gradient(135deg, #d0e6ff, #eaf4ff);
+    border-left: 5px solid #2a5298;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.status-card h2 {
+    font-size: 2.5rem;
+    color: #2a5298;
+    margin: 0.5rem 0;
+}
+
+.form-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.eventos h3 {
+    margin-top: 2rem;
+}
+
+.evento-item {
+    margin-bottom: 0.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.evento-item button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ccc;
+    border: none;
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.recaida {
+    background: #ffe0e0;
+    border-left: 5px solid #c62828;
+}
+
+.quase-recaida {
+    background: #fffacc;
+    border-left: 5px solid #f9a825;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+}
+
+.modal h2 {
+    margin-top: 0;
+}
+
+.modal input,
+.modal textarea {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-fechar {
+    background: #999;
+    color: white;
+}
+
+.btn-recaida {
+    background: #c62828;
+    color: white;
+}
+
+.btn-quase {
+    background: #f9a825;
+    color: white;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+}
