@@ -1,8 +1,8 @@
 const token = localStorage.getItem('token');
+if (!token) window.location = 'login.html';
+
 let eventosCarregados = {};
 let editando = null;
-
-if (!token) window.location = 'login.html';
 
 function logout() {
     localStorage.removeItem('token');
@@ -10,21 +10,20 @@ function logout() {
 }
 
 function abrirModal(tipo) {
-    document.getElementById(`modal${capitalize(tipo)}`).classList.add('active');
+    if (!editando) limparCampos(tipo);
+    document.getElementById(`modal${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).classList.add('active');
 }
 
 function fecharModal(tipo) {
-    document.getElementById(`modal${capitalize(tipo)}`).classList.remove('active');
-}
-
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+    document.getElementById(`modal${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).classList.remove('active');
+    editando = null;
 }
 
 function carregarEventos() {
     fetch('api/get_eventos.php', {
         headers: { Authorization: `Bearer ${token}` }
-    }).then(res => res.json())
+    })
+        .then(res => res.json())
         .then(data => {
             const { eventos, estatisticas } = data;
             eventosCarregados = eventos;
@@ -67,45 +66,83 @@ function registrarRecaida() {
     const quantidade = document.getElementById('quantidadeRecaida').value;
     const tempo = document.getElementById('tempoRecaida').value;
 
-    const payload = editando ? {
-        ...editando,
-        data: datahora, descricao, quantidade, tempo
-    } : { data: datahora, descricao, quantidade, tempo, tipo: 'recaida' };
+    const payload = {
+        data: datahora,
+        descricao,
+        quantidade,
+        tempo,
+        tipo: 'recaida'
+    };
 
-    fetch(editando ? 'api/edit_evento.php' : 'api/add_evento.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload)
-    }).then(() => {
-        fecharModal('recaida');
-        carregarEventos();
-        editando = null;
-    });
+    if (editando) {
+        payload.id = editando.id;
+        fetch('api/edit_evento.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            fecharModal('recaida');
+            carregarEventos();
+        });
+    } else {
+        fetch('api/add_evento.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            fecharModal('recaida');
+            carregarEventos();
+        });
+    }
 }
 
 function registrarQuase() {
     const datahora = document.getElementById('datahoraQuase').value;
     const texto = document.getElementById('textoQuase').value;
 
-    const payload = editando ? {
-        ...editando,
-        data: datahora, texto
-    } : { data: datahora, texto, tipo: 'quase' };
+    const payload = {
+        data: datahora,
+        texto,
+        tipo: 'quase'
+    };
 
-    fetch(editando ? 'api/edit_evento.php' : 'api/add_evento.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload)
-    }).then(() => {
-        fecharModal('quase');
-        carregarEventos();
-        editando = null;
-    });
+    if (editando) {
+        payload.id = editando.id;
+        fetch('api/edit_evento.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            fecharModal('quase');
+            carregarEventos();
+        });
+    } else {
+        fetch('api/add_evento.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        }).then(() => {
+            fecharModal('quase');
+            carregarEventos();
+        });
+    }
 }
 
 function editarEvento(dataStr, id, tipo) {
     const grupo = eventosCarregados[dataStr] || [];
-    const evento = grupo.find(e => e.id == id && e.tipo === tipo);
+    const evento = grupo.find(e => e.id === id && e.tipo === tipo);
     if (!evento) return;
 
     editando = { id, tipo };
@@ -117,11 +154,23 @@ function editarEvento(dataStr, id, tipo) {
         document.getElementById('tempoRecaida').value = evento.tempo;
         abrirModal('recaida');
     } else {
-        const dt = evento.data + 'T' + (evento.hora.length === 5 ? evento.hora : evento.hora.slice(0, 5));
-        document.getElementById('datahoraQuase').value = dt;
+        const horaFormatada = (evento.hora || '00:00').slice(0, 5);
+        document.getElementById('datahoraQuase').value = `${evento.data}T${horaFormatada}`;
         document.getElementById('textoQuase').value = evento.texto;
         abrirModal('quase');
     }
+}
+
+function limparCampos(tipo) {
+  if (tipo === 'recaida') {
+    document.getElementById('datahoraRecaida').value = '';
+    document.getElementById('descricaoRecaida').value = '';
+    document.getElementById('quantidadeRecaida').value = '';
+    document.getElementById('tempoRecaida').value = '';
+  } else {
+    document.getElementById('datahoraQuase').value = '';
+    document.getElementById('textoQuase').value = '';
+  }
 }
 
 window.onload = carregarEventos;

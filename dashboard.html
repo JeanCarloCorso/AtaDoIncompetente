@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
+
 <body>
   <div class="container">
     <button class="logout" onclick="logout()">Sair</button>
@@ -65,106 +67,7 @@
       </div>
     </div>
   </div>
-
-  <script>
-    const token = localStorage.getItem('token');
-    if (!token) window.location = 'login.html';
-
-    function logout() {
-      localStorage.removeItem('token');
-      window.location = 'login.html';
-    }
-
-    function abrirModal(tipo) {
-      document.getElementById(`modal${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).classList.add('active');
-    }
-
-    function fecharModal(tipo) {
-      document.getElementById(`modal${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).classList.remove('active');
-    }
-
-    function carregarEventos() {
-      fetch('api/get_eventos.php', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }).then(res => res.json())
-        .then(data => {
-          const { eventos, estatisticas } = data;
-          document.getElementById('diasSem').innerText = estatisticas.dias_sem_recaida;
-          document.getElementById('recorde').innerText = estatisticas.recorde;
-          document.getElementById('faltam').innerText = estatisticas.dias_para_bater_recorde;
-          document.getElementById('tempoPerdido').innerText = estatisticas.tempo_total_perdido;
-
-          const lista = document.getElementById('lista');
-          lista.innerHTML = '';
-
-          Object.keys(eventos).sort().reverse().forEach(data => {
-            const grupo = eventos[data];
-            const dia = new Date(data).toLocaleDateString();
-
-            const header = document.createElement('h3');
-            header.innerText = dia;
-            lista.appendChild(header);
-
-            grupo.forEach(e => {
-              const div = document.createElement('div');
-              div.className = `evento-item ${e.tipo === 'recaida' ? 'recaida' : 'quase-recaida'}`;
-              div.innerHTML = `
-                <strong>${e.hora || '--:--'}</strong> - ${
-                  e.tipo === 'recaida'
-                  ? `${e.descricao} (${e.quantidade})<br><em>Tempo: ${e.tempo}</em>`
-                  : `<em>Quase recaída:</em><br>${e.texto}`
-                }
-                <button onclick="editarEvento()">✏️</button>
-              `;
-              lista.appendChild(div);
-            });
-          });
-        });
-    }
-
-    function registrarRecaida() {
-      const datahora = document.getElementById('datahoraRecaida').value;
-      const descricao = document.getElementById('descricaoRecaida').value;
-      const quantidade = document.getElementById('quantidadeRecaida').value;
-      const tempo = document.getElementById('tempoRecaida').value;
-
-      fetch('api/add_evento.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ data: datahora, descricao, quantidade, tempo, tipo: 'recaida' })
-      }).then(() => {
-        fecharModal('recaida');
-        carregarEventos();
-      });
-    }
-
-    function registrarQuase() {
-      const datahora = document.getElementById('datahoraQuase').value;
-      const texto = document.getElementById('textoQuase').value;
-
-      fetch('api/add_evento.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({ data: datahora, texto, tipo: 'quase' })
-      }).then(() => {
-        fecharModal('quase');
-        carregarEventos();
-      });
-    }
-
-    function editarEvento() {
-      alert('Função de edição ainda em desenvolvimento.');
-    }
-
-    window.onload = carregarEventos;
-  </script>
+  <script src="js/dashboard.js"></script>
 </body>
+
 </html>
